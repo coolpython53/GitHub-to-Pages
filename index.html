@@ -2,7 +2,8 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>GitHub → GitHub Pages Converter</title>
+  <title>GitHub Link Converter</title>
+
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -12,7 +13,7 @@
       color: white;
     }
 
-    input {
+    select, input {
       width: 80%;
       padding: 10px;
       margin: 10px 0;
@@ -42,40 +43,51 @@
     }
   </style>
 </head>
+
 <body>
 
-  <h2>🔁 GitHub → GitHub Pages Converter</h2>
+  <h2>🔁 GitHub Link Converter</h2>
+
+  <select id="mode">
+    <option value="pages">🌐 Convert to GitHub Pages URL</option>
+    <option value="raw">🔥 Convert to RAW URL</option>
+  </select>
 
   <input id="inputUrl" placeholder="Paste GitHub blob URL here">
   <br>
   <button onclick="convert()">Convert 🚀</button>
 
-  <div class="output" id="output">Your converted link will appear here...</div>
+  <div class="output" id="output">Result will appear here...</div>
 
   <script>
     function convert() {
       const url = document.getElementById("inputUrl").value.trim();
+      const mode = document.getElementById("mode").value;
 
       try {
         const parsed = new URL(url);
-
-        // Example path:
-        // /coolpython53/prologue-assets/blob/main/wanderer/file.mp3
         const parts = parsed.pathname.split("/");
 
-        if (parts.length < 5 || parts[3] !== "blob") {
+        if (parts.length < 6 || parts[3] !== "blob") {
           throw new Error("Not a valid GitHub blob URL");
         }
 
         const user = parts[1];
         const repo = parts[2];
-
-        // remove: /user/repo/blob/branch
+        const branch = parts[4];
         const filePath = parts.slice(5).join("/");
 
-        const pagesUrl = `https://${user}.github.io/${repo}/${filePath}`;
+        let result = "";
 
-        document.getElementById("output").innerText = pagesUrl;
+        if (mode === "pages") {
+          result = `https://${user}.github.io/${repo}/${filePath}`;
+        }
+
+        if (mode === "raw") {
+          result = `https://raw.githubusercontent.com/${user}/${repo}/${branch}/${filePath}`;
+        }
+
+        document.getElementById("output").innerText = result;
 
       } catch (e) {
         document.getElementById("output").innerText =
